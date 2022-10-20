@@ -1,0 +1,90 @@
+// 重置样式
+* {
+    box-sizing: border-box;
+   }
+   
+   html {
+     height: 100%;
+     font-size: 16px;
+     padding: 0;
+     margin: 0;
+   }
+   body {
+     padding: 0;
+     margin: 0;
+     height: 100%;
+     color: #333;
+     font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
+   }
+   
+   ul,
+   h1,
+   h3,
+   h4,
+   p,
+   dl,
+   dd {
+     padding: 0;
+     margin: 0;
+   }
+   
+    a:focus,
+    a:active {
+    outline: none;
+    }
+
+    a,
+    a:focus,
+    a:hover {
+    cursor: pointer;
+    color: #333;
+    text-decoration: none;
+    }
+   
+   i {
+     font-style: normal;
+   }
+   
+   input[type="text"],
+   input[type="search"],
+   input[type="password"], 
+   input[type="checkbox"]{
+     padding: 0;
+     outline: none;
+     border: none;
+     &::placeholder{
+       color: #ccc;
+     }
+   }
+   
+   img {
+     max-width: 100%;
+     max-height: 100%;
+     vertical-align: middle;
+   }
+   
+   ul {
+     list-style: none;
+   }
+   .no-padding {
+    padding: 0px !important;
+  }
+
+   .fr {
+    float: right;
+   }
+  
+  .fl {
+    float: left;
+  }
+
+  .clearfix {
+    &:after {
+      visibility: hidden;
+      display: block;
+      font-size: 0;
+      content: " ";
+      clear: both;
+      height: 0;
+    }
+  }
