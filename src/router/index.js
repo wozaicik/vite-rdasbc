@@ -3,7 +3,21 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 const Layout = () => import('../layout/index.vue')
 
 const routes = [
-  { path: '/', component: Layout }
+  {
+    path: '/',
+    component: Layout,
+    redirect: '/home',
+    children: [
+      {
+        path: '/home',
+        component: Layout
+      },
+      {
+        path: '/home/:id',
+        component: Layout
+      }
+    ]
+  }
 ]
 
 // 创建路由实例

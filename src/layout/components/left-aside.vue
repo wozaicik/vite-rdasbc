@@ -5,27 +5,29 @@
         class="el-menu-vertical-demo"
         default-active="2"
         text-color="#fff"
+        unique-opened
+        router
     >
-        <el-sub-menu index="1">
+        <el-sub-menu v-for="sub in leftAsideOptions" :key="sub.id" :index="sub.id">
             <template #title>
-                <el-icon><location /></el-icon>
-                <span>Navigator One</span>
+                <el-icon><component :is="sub.icon" /></el-icon>
+                <span>{{sub.name}}</span>
             </template>
-            <el-menu-item index="1-1">item one</el-menu-item>
-            <el-menu-item index="1-2">item two</el-menu-item>
+            <el-menu-item v-for="item in sub.children" :key="item.id" :index="item.path">
+                <el-icon><component :is="item.icon" /></el-icon>
+                <span>{{item.name}}</span>
+            </el-menu-item>
         </el-sub-menu>
     </el-menu>
 </template>
 
-<script>
-
+<script setup>
+import { leftAsideOptions } from '@/api/constants.js'
 </script>
 
 <style lang="scss" scoped>
 .el-menu{
-    .el-sub-menu{
-        height: 100%;
-        width: 200px;
-    }
+    border: 0;
+    height: 100%;
 }
 </style>

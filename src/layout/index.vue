@@ -8,7 +8,7 @@
           <el-main>Main11111</el-main>
           <el-footer>Footer</el-footer>
         </el-container>
-        <el-aside width="200px">Aside</el-aside>
+        <el-aside width="200px" v-if="false">Aside</el-aside>
       </el-container>
     </div>
   </template>
@@ -41,7 +41,9 @@ import LeftAside from './components/left-aside.vue'
         .el-footer{
             padding: 0;
             margin: 0;
+            height: 200px;
             overflow: hidden;
+            background-color: skyblue;
         }
     }
 }
