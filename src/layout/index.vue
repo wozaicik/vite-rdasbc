@@ -5,7 +5,9 @@
             <LeftAside></LeftAside>
         </el-aside>
         <el-container>
-          <el-main>Main11111</el-main>
+          <el-main>
+            <MainViewer></MainViewer>
+          </el-main>
           <el-footer v-if="layout.isFooterOpen">Footer</el-footer>
         </el-container>
         <el-aside width="200px" v-if="layout.isRightCollapse" class="right-aside">Aside</el-aside>
@@ -16,6 +18,7 @@
 <script setup>
 
 import LeftAside from './components/left-aside.vue'
+import MainViewer from './components/main-viewer.vue'
 import { layoutStore } from '@/store/layoutStore.js'
 import { storeToRefs } from 'pinia'
 
@@ -46,8 +49,11 @@ const { isLeftCollapse } = storeToRefs(layout)
               width:64px;
         }
         .el-main{
+            width: 100%;
+            height: 100%;
             padding: 0;
             margin: 0;
+            border: 0;
             overflow: hidden;
         }
         .el-footer{

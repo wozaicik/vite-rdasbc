@@ -36,8 +36,6 @@ import { storeToRefs } from 'pinia'
 
 const layout = layoutStore()
 
-// const isColl = ref(true)
-
 const { isLeftCollapse } = storeToRefs(layout)
 const toggle = (isCollapse) => {
   layout.isLeftCollapse = isCollapse

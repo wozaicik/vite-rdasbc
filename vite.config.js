@@ -11,7 +11,9 @@ export default defineConfig({
     eslintPlugin({
       include: ['src/**/*.js', 'src/**/*.vue', 'src/*.js', 'src/*.vue']
     }),
-    cesium({})
+    cesium({
+      rebuildCesium: true
+    })
   ],
   // 这里是为了使用  @ 符号引入
   resolve: {

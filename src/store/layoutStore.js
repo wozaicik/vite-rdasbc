@@ -6,7 +6,7 @@ export const layoutStore = defineStore('layout', {
     isViewer: false, // 判断地球是否加载完毕
     isLeftCollapse: true, // 左侧菜单栏的缩放控制
     isFooterOpen: false, // 底部界面的上升下降控制
-    isRightCollapse: true// 右侧菜单栏的缩放控制
+    isRightCollapse: false// 右侧菜单栏的缩放控制
   }),
   actions: {
 
