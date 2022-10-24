@@ -47,7 +47,7 @@ function initViewer (props, callback) {
 
       scene = viewer.scene
       // 将加载状态改为true
-      layout.isViewer = true
+      layout.setIsViewer()
     } catch (e) {
       ElMessage.error(e)
     }

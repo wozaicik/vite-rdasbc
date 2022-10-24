@@ -12,6 +12,9 @@ import App from './App.vue'
 
 import 'normalize.css'
 
+// 导入自己的ui组件库
+import UI from '@/components/library/index'
+
 const app = createApp(App)
 // 创建pinia
 const pinia = createPinia()
@@ -19,6 +22,7 @@ const pinia = createPinia()
 app.use(ElementPlus)
 app.use(pinia)
 app.use(router)
+app.use(UI)
 
 // 全局引入icon图标
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {

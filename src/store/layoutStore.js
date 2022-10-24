@@ -9,7 +9,9 @@ export const layoutStore = defineStore('layout', {
     isRightCollapse: false// 右侧菜单栏的缩放控制
   }),
   actions: {
-
+    setIsViewer () {
+      this.isViewer = !this.isViewer
+    }
   },
   getters: {
 
