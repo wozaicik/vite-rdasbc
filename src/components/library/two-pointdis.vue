@@ -1,43 +1,90 @@
 <template>
-  <el-row>
-      <el-col class="card-header">
-        <span>两点距离</span>
-        <el-button class="button" text>Operation button</el-button>
-      </el-col>
-    <TwoPointDistanceItem></TwoPointDistanceItem>
-    {{tempCoor}}
-  </el-row>
+  <div class="two-point">
+    <el-row>
+        <el-col class="card-header" :span="24">
+          <span>两点距离</span>
+          <el-button class="button" text>Operation button</el-button>
+        </el-col>
+    </el-row>
+    <template v-if="show">
+      <TwoPointDistanceItem v-for="(item,i) in coordinatePair" :key="i" :data="item"></TwoPointDistanceItem>
+    </template>
+  </div>
 </template>
 
 <script>
-import { defineComponent, ref, watch } from 'vue'
+import { defineComponent, reactive, ref, watch } from 'vue'
 import * as Cesium from 'cesium'
 import { useRoute } from 'vue-router'
+import { drawPoint } from '@/utils/drawEntity.js'
+import { ElMessage } from 'element-plus'
 
 export default defineComponent({
   name: 'twoPointDistance',
   setup () {
     // 坐标对 存放传给子组件的数据  数据格式为：[[],[],[]]
-    // const coordinatePair = reactive([])
+    const coordinatePair = reactive([])
     // // 存放临时的坐标对  只有当数组长度为2时 才会将临时的数组存放进coordinatePair中
-    // const tempCoorPair = reactive([])
+    let tempCoorPair = []
     // 存放事件处理器 便于后期销毁
     let handlerEvent
-    // 存放零时的坐标
+    // 存放临时的坐标
     const tempCoor = ref(null)
 
+    const show = ref(false)
+
+    // 根据路由来判断，是否开启左键点击事件，如果路由为：twoPointDistance
+    // 则开启鼠标左边点击事件，当路由发生变化时，销毁事件
+    // 监听路由的变化 开启和关闭事件
     const route = useRoute()
     watch(() => route.params.id, (newVal) => {
       if (newVal === 'twoPointDistance') {
         setTimeout(() => {
           const { handler } = getCoor(tempCoor)
           handlerEvent = handler
+          ElMessage({
+            message: '请点击地球上任意位置',
+            type: 'success'
+          })
         }, 3000)
       } else {
         handlerEvent.destroy()
         handlerEvent = null
       }
     }, { immediate: true })
+
+    // 监听临时坐标，当临时坐标发生改变时，且其值为Cartesian3
+    // 则说明是符合要求的car3坐标
+    // 需要进行如下几件事：
+    // 1. 将坐标添加到临时坐标对
+    // 2. 根据获取的坐标绘制点
+    // 3. 保存绘制的entity
+    // 4. 序号自动加+
+    const entities = [] // 存储entity，主要为点
+    const entitiesId = []// 存储entity的id
+    const index = ref(1)// 序号
+    watch(tempCoor, (newVal) => {
+      // 判断坐标的类型是否为Cartesian3
+      if (newVal instanceof Cesium.Cartesian3) {
+        // 将坐标添加到临时坐标对
+        tempCoorPair.push(newVal)
+        // 设置id  Two Point 1...
+        const id = 'TPD-point-' + index.value
+        // 绘制点
+        const { entityPoint } = drawPoint(newVal, id, index.value)
+        entities.push(entityPoint)
+        entitiesId.push(id)
+        index.value++
+        // 判断tempCoorPair的长度是否为2，当为2时，将其添加到坐标对中
+        if (tempCoorPair.length === 2) {
+          coordinatePair.push(tempCoorPair)
+          tempCoorPair = []
+          show.value = true
+        }
+      }
+    })
+
+    return { coordinatePair, show }
   }
 })
 const getCoor = (tempCoor) => {
@@ -58,19 +105,23 @@ const getCoor = (tempCoor) => {
 </script>
 
 <style lang="scss" scoped>
-.el-row{
-  width: 480px;
-  height: 550px;
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  background-color: #fff;
-  z-index: 999;
-  .el-col {
-  display: flex;
-  justify-content:space-around;
-  align-items: center;
-}
+.two-point{
+    width: 480px;
+    height: 550px;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: #fff;
+    z-index: 999;
+    .el-row{
+      display: flex;
+      flex-wrap:nowrap;
+      .el-col {
+        display: flex;
+        justify-content:space-around;
+        align-items: center;
+    }
+  }
 }
 
 </style>

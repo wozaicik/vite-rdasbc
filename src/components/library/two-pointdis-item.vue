@@ -1,7 +1,11 @@
 <template>
-    <el-card :body-style="{ padding: '5px' }">
+    <el-card :body-style="{ padding: '5px' }" shadow="always">
       <el-row >
-        <el-col :span="24">111</el-col>
+        <el-col :span="24">
+        <el-row>
+          <el-col :span="12">111</el-col><el-col :span="12">111</el-col>
+        </el-row>
+        </el-col>
       </el-row>
       <el-row>
         <el-col :span="24">222</el-col>
@@ -22,7 +26,8 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue'
+import { defineComponent, onMounted } from 'vue'
+import { calTwoPointDistance } from '@/utils/caltwopoidis.js'
 
 export default defineComponent({
   name: 'TwoPointDistanceItem',
@@ -33,7 +38,9 @@ export default defineComponent({
     }
   },
   setup (props) {
-
+    onMounted(() => {
+      calTwoPointDistance(props.data)
+    })
   }
 })
 
@@ -42,8 +49,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 .el-card{
   width: 100%;
-  height: 100%;
+  height: 120px;
   padding: 0px;
-
 }
 </style>
