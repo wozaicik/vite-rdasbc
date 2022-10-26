@@ -43,16 +43,5 @@ export const calTwoPointDistance = (data) => {
   // 计算两个点之间的坡向
   const aspect = calAspect(lonlatOne, lonlatTwo, bearing)
 
-  console.log(lonlatOne)
-  console.log(lonlatTwo)
-  console.log(CGCSOne)
-  console.log(CGCSTwo)
-  console.log(localOne)
-  console.log(localTWo)
-  console.log(distance)
-  console.log(bearing)
-  console.log(midpoint)
-  console.log(slope)
-  console.log(aspect)
   return { lonlatOne, lonlatTwo, CGCSOne, CGCSTwo, localOne, localTWo, distance, bearing, midpoint, slope, aspect }
 }

@@ -115,7 +115,7 @@ export const calDisBear = (oneLonLat, twoLonLat) => {
   const to = turf.point([twoLonLat.x, twoLonLat.y])
 
   // 使用经纬度 计算距离
-  const distance = turf.distance(from, to) * 1000
+  const distance = (turf.distance(from, to) * 1000).toFixed(2)
   // 使用经纬度 计算方位
   let bearing = turf.bearing(from, to)
 
@@ -137,7 +137,10 @@ export const calCenter = (oneLonLat, twoLonLat) => {
   const pointOne = turf.point([oneLonLat.x, oneLonLat.y])
   const pointTwo = turf.point([twoLonLat.x, twoLonLat.y])
   const midpoint = turf.midpoint(pointOne, pointTwo)
-  return { midpoint }
+
+  const center = [midpoint.geometry.coordinates[0], midpoint.geometry.coordinates[1]]
+  return center
+  // return midpoint
 }
 
 /**
@@ -154,11 +157,15 @@ export const calSlope = (oneLonLat, twoLonLat, distance) => {
   const height = Math.abs(oneLonLat.z - twoLonLat.z)
   // 如果高度为0 或者 距离为0 则坡度为0
   if (height === 0 || distance === 0) {
-    const slope = 0
-    return { slope }
+    return 0
   }
-  const slope = height / distance * 100
-  return { slope }
+  const slope = ((height / distance) * 100)
+
+  if (slope < 1) {
+    return 1
+  }
+
+  return slope
 }
 
 /**
