@@ -4,6 +4,12 @@ import { onMounted, ref } from 'vue'
 import { calTwoPointDistance } from '@/utils/caltwopoidis.js'
 import { drawPolyline } from '@/utils/drawEntity.js'
 
+/**
+ *
+ * @param {Array} data - 存储有两个点的坐标
+ * @param {*} index - 序号，用来生成id
+ * @returns
+ */
 export const useTwoPointDistance = (data, index) => {
   const id = 'TPD-polyline-' + index
   const oneLonLat = ref(null)
@@ -31,7 +37,6 @@ export const useTwoPointDistance = (data, index) => {
     tpMidPoint.value = midpoint
     tpSlope.value = slope
     tpAspect.value = aspect
-    console.log(tpSlope.value)
     entityPolyline.value = drawPolyline(data, tpMidPoint, id, tpDistance.value)
   })
   return {

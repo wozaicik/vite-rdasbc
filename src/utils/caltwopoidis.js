@@ -3,6 +3,7 @@
 // 计算经纬度 CGCS2000 地方坐标系 距离 方位角 坡度 坡向
 
 import { toRaw } from 'vue'
+import * as Cesium from 'cesium'
 import {
   Cartesian3ToCartographicDegree,
   lonLatToCGCS,
@@ -43,5 +44,12 @@ export const calTwoPointDistance = (data) => {
   // 计算两个点之间的坡向
   const aspect = calAspect(lonlatOne, lonlatTwo, bearing)
 
-  return { lonlatOne, lonlatTwo, CGCSOne, CGCSTwo, localOne, localTWo, distance, bearing, midpoint, slope, aspect }
+  const doubleClickZoomToFn = (pointCoor) => {
+    // 1. Fly to a position with a top-down view
+    window.viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(pointCoor[0], pointCoor[1], 50)
+    })
+  }
+
+  return { lonlatOne, lonlatTwo, CGCSOne, CGCSTwo, localOne, localTWo, distance, bearing, midpoint, slope, aspect, doubleClickZoomToFn }
 }

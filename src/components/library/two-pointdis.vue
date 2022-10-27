@@ -4,13 +4,19 @@
         <el-row>
             <el-col class="card-header" :span="24">
               <span>两点距离</span>
-              <el-button class="button" text>Operation button</el-button>
+              <el-button class="button" text @click="clearAll">清 除</el-button>
             </el-col>
         </el-row>
       </div>
-      <template v-if="show" >
-        <TwoPointDistanceItem v-for="(item,i) in coordinatePair" :key="i" :data="item" :index="i"></TwoPointDistanceItem>
-      </template>
+      <el-space
+      fill
+      wrap
+      direction="vertical"
+      style="width: 100%">
+        <template v-if="show" >
+          <TwoPointDistanceItem v-for="(item,i) in coordinatePair" :key="i" :data="item" :index="i"></TwoPointDistanceItem>
+        </template>
+      </el-space>
   </div>
 </template>
 
@@ -18,7 +24,7 @@
 import { defineComponent, reactive, ref, toRaw, watch } from 'vue'
 import * as Cesium from 'cesium'
 import { useRoute } from 'vue-router'
-import { drawPoint } from '@/utils/drawEntity.js'
+import { drawPoint, clearEntityArray } from '@/utils/drawEntity.js'
 import { ElMessage } from 'element-plus'
 
 export default defineComponent({
@@ -66,8 +72,8 @@ export default defineComponent({
     // 2. 根据获取的坐标绘制点
     // 3. 保存绘制的entity
     // 4. 序号自动加+
-    const entities = [] // 存储entity，主要为点
-    const entitiesId = []// 存储entity的id
+    let entities = [] // 存储entity，主要为点
+    let entitiesId = []// 存储entity的id
     const index = ref(1)// 序号
     watch(tempCoor, (newVal) => {
       // 判断坐标的类型是否为Cartesian3
@@ -90,7 +96,25 @@ export default defineComponent({
       }
     })
 
-    return { coordinatePair, show }
+    // 清除所有的数据
+    // 1. 清除坐标对中的数据
+    // 2. 清除临时坐标对中的数据
+    // 3. 清除所有的entityPoint数据
+    // 4. 清除所有的entityPolyline数据
+    // 5. 将序号重置为1
+    // 6. 将show改为false
+    const clearAll = () => {
+      coordinatePair.splice(0, coordinatePair.length)
+      tempCoorPair = []
+      tempCoor.value = null
+      clearEntityArray(entities)
+      entities = []
+      entitiesId = []
+      index.value = 1
+      show.value = false
+    }
+
+    return { coordinatePair, show, clearAll }
   }
 })
 const getCoor = (tempCoor) => {

@@ -65,3 +65,19 @@ export const drawPolyline = (coordinates, tpMidPoint, id, distance) => {
   viewer = null
   return { entityPolyline }
 }
+
+/**
+ *
+ * @param {Array} entityArray 存放entity数据的数组
+ */
+export const clearEntityArray = (entityArray) => {
+  if (window.viewer) {
+    let viewer = window.viewer
+    entityArray.forEach(item => {
+      if (item) {
+        viewer.entities.remove(item)
+      }
+    })
+    viewer = null
+  }
+}
