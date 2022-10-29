@@ -8,14 +8,15 @@
             </el-col>
         </el-row>
       </div>
-      <el-space
-      fill
-      wrap
-      direction="vertical"
-      style="width: 100%">
+      <el-space fill wrap direction="vertical" style="width: 100%">
         <template v-if="show" >
           <TwoPointDistanceItem v-for="(item,i) in coordinatePair" :key="i" :data="item" :index="i"></TwoPointDistanceItem>
         </template>
+        <el-card v-else>
+          <div >请使用鼠标左键点击地球任意位置！</div>
+          <div >此功能将计算两个点之间的距离、坡度、坡向、方位角</div>
+          <div >同时显示国家2000坐标、地方坐标</div>
+        </el-card>
       </el-space>
   </div>
 </template>
@@ -137,7 +138,7 @@ const getCoor = (tempCoor) => {
 <style lang="scss" scoped>
 .two-point{
     width: 480px;
-    height: 550px;
+    max-height: 550px;
     position: absolute;
     top: 5px;
     right: 5px;
@@ -154,6 +155,14 @@ const getCoor = (tempCoor) => {
         align-items: center;
     }
   }
+    }
+    .el-space{
+      .el-card{
+        text-align: center;
+        div{
+          margin-top: 10px;
+        }
+      }
     }
 
 }

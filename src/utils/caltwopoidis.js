@@ -15,7 +15,9 @@ import {
 } from './singlecoortran'
 
 export const calTwoPointDistance = (data) => {
-//   第一个点
+  // console.log(data[0].v)
+
+  //  第一个点
   const dataOne = toRaw(data[0])
   // 第二个点
   const dataTwo = toRaw(data[1])
@@ -51,5 +53,21 @@ export const calTwoPointDistance = (data) => {
     })
   }
 
-  return { lonlatOne, lonlatTwo, CGCSOne, CGCSTwo, localOne, localTWo, distance, bearing, midpoint, slope, aspect, doubleClickZoomToFn }
+  const twoCoors = [dataOne, dataTwo]
+
+  return {
+    lonlatOne,
+    lonlatTwo,
+    CGCSOne,
+    CGCSTwo,
+    localOne,
+    localTWo,
+    distance,
+    bearing,
+    midpoint,
+    slope,
+    aspect,
+    doubleClickZoomToFn,
+    twoCoors
+  }
 }

@@ -150,9 +150,6 @@ export default defineComponent({
   width: 100%;
   padding: 0px;
   font-size: 12px;
-  .el-row{
-    // height: 16px;
-  }
 }
 .coor-justify{
   .el-col{

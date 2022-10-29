@@ -7,7 +7,7 @@ import { drawPolyline } from '@/utils/drawEntity.js'
 /**
  *
  * @param {Array} data - 存储有两个点的坐标
- * @param {*} index - 序号，用来生成id
+ * @param {Number} index - 序号，用来生成id
  * @returns
  */
 export const useTwoPointDistance = (data, index) => {

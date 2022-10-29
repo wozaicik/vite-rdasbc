@@ -81,3 +81,54 @@ export const clearEntityArray = (entityArray) => {
     viewer = null
   }
 }
+
+export const drawLabel = (tpMidPoint, id, distance) => {
+  let viewer = window.viewer
+
+  const entityPolyline = viewer.entities.add({
+    id,
+    position: Cesium.Cartesian3.fromDegrees(tpMidPoint.value[0], tpMidPoint.value[1]),
+    label: {
+      text: distance.toString(),
+      font: '16px sans-serif',
+      style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+      outlineWidth: 2,
+      heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+      verticalOrigin: Cesium.VerticalOrigin.BASELINE,
+      pixelOffset: new Cesium.Cartesian2(0, -10),
+      disableDepthTestDistance: Number.POSITIVE_INFINITY // draws the label in front of terrain
+    }
+  })
+
+  viewer = null
+  return { entityPolyline }
+}
+
+export const drawPolylineNone = (coordinates, tpMidPoint, id, distance) => {
+  let viewer = window.viewer
+
+  const entityPolyline = viewer.entities.add({
+    id,
+    position: Cesium.Cartesian3.fromDegrees(tpMidPoint[0], tpMidPoint[1]),
+    polyline: {
+      positions: coordinates,
+      width: 3,
+      material: Cesium.Color.RED,
+      clampToGround: true
+    },
+    label: {
+      text: distance.toString(),
+      font: '16px sans-serif',
+      style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+      outlineWidth: 2,
+      heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+      verticalOrigin: Cesium.VerticalOrigin.BASELINE,
+      pixelOffset: new Cesium.Cartesian2(0, -10),
+      disableDepthTestDistance: Number.POSITIVE_INFINITY // draws the label in front of terrain
+    }
+  })
+
+  viewer = null
+  const polyline = entityPolyline.polyline
+  return { entityPolyline, polyline }
+}
