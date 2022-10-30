@@ -8,7 +8,8 @@
           <el-main>
             <MainViewer></MainViewer>
           </el-main>
-          <el-footer v-if="layout.isFooterOpen">Footer</el-footer>
+          <el-footer v-if="layout.isFooterOpen"  id="Footer">
+          </el-footer>
         </el-container>
         <el-aside width="200px" v-if="layout.isRightCollapse" class="right-aside">Aside</el-aside>
       </el-container>
@@ -58,11 +59,21 @@ const { isLeftCollapse } = storeToRefs(layout)
             overflow: hidden;
         }
         .el-footer{
+            border: 0;
             padding: 0;
             margin: 0;
-            height: 200px;
+            width: 100%;
+            height: 300px;
             overflow: hidden;
-            background-color: skyblue;
+            background-color: fff;
+            div{
+              border: 0;
+              padding: 0;
+              margin: 0;
+              width: 100%;
+              height: 300px;
+              overflow: hidden;
+            }
         }
         .right-aside{
             padding: 0;
