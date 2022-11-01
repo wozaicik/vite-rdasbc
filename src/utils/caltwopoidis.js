@@ -53,6 +53,7 @@ export const calTwoPointDistance = (data) => {
     })
   }
 
+  // cartesian3坐标组成的数组
   const twoCoors = [dataOne, dataTwo]
 
   return {

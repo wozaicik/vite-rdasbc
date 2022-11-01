@@ -8,7 +8,7 @@ export const leftAsideOptions = [
     children: [
       { id: 'A001001', name: '两点距离', path: '/home/twoPointDistance', icon: 'Minus' },
       { id: 'A001002', name: '多点距离', path: '/home/multipointDistance', icon: 'Share' },
-      { id: 'A001003', name: '计算面积', path: '/home/area', icon: 'FullScreen' }
+      { id: 'A001003', name: '计算面积', path: '/home/calarea', icon: 'FullScreen' }
     ]
   },
   {

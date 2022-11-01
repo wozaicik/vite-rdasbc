@@ -6,6 +6,10 @@ import { drawPolyline } from '@/utils/drawEntity.js'
 import * as Cesium from 'cesium'
 import * as echarts from 'echarts'
 // import { layoutStore } from '@/store/layoutStore.js'
+// import { storeToRefs } from 'pinia'
+// import { useRoute } from 'vue-router'
+// import { ElMessage } from 'element-plus'
+// import { layoutStore } from '@/store/layoutStore.js'
 
 /**
  *
@@ -60,7 +64,7 @@ export const useTwoPointDistance = (data, index) => {
 }
 
 /**
- *
+ *  计算断面图的数据
  * @param {Object} startLonLat  - 第一个点的经纬度
  * @param {Object} endLonLat  - 第二个点的经纬度
  * @param {Number} startDistance  - 开始的距离

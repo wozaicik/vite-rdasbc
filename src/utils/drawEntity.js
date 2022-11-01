@@ -38,6 +38,14 @@ export const drawPoint = (coor, id, index) => {
   return { entityPoint }
 }
 
+/**
+ *  绘制线entity
+ * @param {Array} coordinates - 线段的坐标数组
+ * @param {Cartesian3} tpMidPoint - label的坐标
+ * @param {String} id - entity的id
+ * @param {Number} distance - 线段的距离
+ * @returns
+ */
 export const drawPolyline = (coordinates, tpMidPoint, id, distance) => {
   let viewer = window.viewer
 
@@ -67,7 +75,7 @@ export const drawPolyline = (coordinates, tpMidPoint, id, distance) => {
 }
 
 /**
- *
+ *  移除entity
  * @param {Array} entityArray 存放entity数据的数组
  */
 export const clearEntityArray = (entityArray) => {
@@ -82,6 +90,13 @@ export const clearEntityArray = (entityArray) => {
   }
 }
 
+/**
+ *
+ * @param {Cartesian3} tpMidPoint 点的坐标
+ * @param {String} id entity的id
+ * @param {Number} distance 距离
+ * @returns
+ */
 export const drawLabel = (tpMidPoint, id, distance) => {
   let viewer = window.viewer
 
@@ -104,6 +119,14 @@ export const drawLabel = (tpMidPoint, id, distance) => {
   return { entityPolyline }
 }
 
+/**
+ *  绘制线entity-不是用响应式 同时返回polyline本身
+ * @param {Array} coordinates 坐标数组
+ * @param {Cartesian3} tpMidPoint entity的position
+ * @param {String} id entity的id
+ * @param {Number} distance 距离
+ * @returns
+ */
 export const drawPolylineNone = (coordinates, tpMidPoint, id, distance) => {
   let viewer = window.viewer
 
