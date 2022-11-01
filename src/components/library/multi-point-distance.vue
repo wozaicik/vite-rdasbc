@@ -4,23 +4,29 @@
           <el-row>
               <el-col class="card-header" :span="24">
                 <span >多点距离</span>
-                <el-button class="button" type="primary" icon="Delete" >清除所有</el-button>
+                <el-button class="button" type="primary" icon="Delete" @click="clearEventFn()">清除所有</el-button>
               </el-col>
           </el-row>
         </div>
         <el-card :body-style="{ padding: '15px' }" shadow="always">
-            <MulPointDistanceItem></MulPointDistanceItem>
+            <MulPointDistanceItem v-model="isClearAll"></MulPointDistanceItem>
         </el-card>
     </div>
   </template>
 
 <script>
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 
 export default defineComponent({
   name: 'multipointDistance',
   setup () {
+    // 是否清除所有的entity，默认不清除
+    const isClearAll = ref(false)
+    const clearEventFn = () => {
+      isClearAll.value = true
+    }
 
+    return { isClearAll, clearEventFn }
   }
 })
 </script>

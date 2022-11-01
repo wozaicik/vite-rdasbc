@@ -12,14 +12,13 @@
         </el-row>
         <el-row>
             <el-col :span="24" class="option">
-                <el-button  size="small">保存</el-button>
-                <el-button  size="small">清除</el-button>
+                <el-button  size="small" @click="savePolylineFn()">保存</el-button>
+                <el-button  size="small" @click="clearEntityFn()">清除</el-button>
                 <el-switch
                     v-model="isFooterOpen"
                     size="small"
                     active-text="断面图-开"
                     inactive-text="断面图-关"
-                    @change="showSectionDraw($event)"
                 />
             </el-col>
         </el-row>
@@ -37,10 +36,17 @@ import { calTwoPointDistance } from '@/utils/caltwopoidis.js'
 import { useSection, useDrawSection } from '@/utils/useRoad.js'
 import { layoutStore } from '@/store/layoutStore.js'
 import { storeToRefs } from 'pinia'
+import { useVModel } from '@vueuse/core'
 
 export default defineComponent({
   name: 'MulPointDistanceItem',
-  setup () {
+  props: {
+    modelValue: {
+      type: Boolean,
+      default: false
+    }
+  },
+  setup (props, { emit }) {
     // ----------------------开启事件-----------------
     // 存放事件处理器 便于后期销毁
     let handlerEvent
@@ -113,6 +119,9 @@ export default defineComponent({
           coordinatePair.push(lastEntityPolyline.polyline.positions._value[0])
           // 移除最后一个线段
           window.viewer.entities.remove(lastEntityPolyline)
+
+          // 移除最后49个数据
+          section.splice(-49)
 
           // 移除最后一个距离
           distanceArray.pop()
@@ -205,11 +214,84 @@ export default defineComponent({
     const layout = layoutStore()
     const { isFooterOpen } = storeToRefs(layout)
 
-    watch([section, isFooterOpen], ([]) => {
+    watch(section, () => {
+      if (isFooterOpen) {
+        useDrawSection(section)
+      }
+    })
+    // --------------保存-----重新开始画一条
+    // 保存所有的entity
+    const allEntity = []
+    // 保存所有的entity id
+    const allIds = []
+    const savePolylineFn = () => {
+      // 保存现有entity
+      allEntity.push(...entityPointArray)
+      allIds.push(...entityPointIds)
 
+      allEntity.push(...entityPolylineArray)
+      allIds.push(...entityPolylineIds)
+      // 对一些变量进行重置
+      // 点
+      index.value = 1
+      tempCoor.value = null
+      entityPointArray.splice(0, entityPointArray.length)
+      entityPointIds.splice(0, entityPointIds.length)
+      // 线
+      entityPolylineArray.splice(0, entityPolylineArray.length)
+      entityPolylineIds.splice(0, entityPolylineIds.length)
+      coordinatePair.splice(0, coordinatePair.length)
+      distanceArray.splice(0, distanceArray.length)
+      section.splice(0, section.length)
+    }
+    // ------------清除正在画的数据---
+    const clearEntityFn = () => {
+      if (window.viewer) {
+        // 清除点entity
+        entityPointArray.forEach(item => {
+          window.viewer.entities.remove(item)
+        })
+        entityPointArray.splice(0, entityPointArray.length)
+        entityPointIds.splice(0, entityPointIds.length)
+        // 清除线
+        entityPolylineArray.forEach(item => {
+          window.viewer.entities.remove(item)
+        })
+        entityPolylineIds.splice(0, entityPolylineIds.length)
+        entityPolylineArray.splice(0, entityPolylineArray.length)
+        // 将数据重置
+        // 点
+        index.value = 1
+        tempCoor.value = null
+        // 线
+        coordinatePair.splice(0, coordinatePair.length)
+        distanceArray.splice(0, distanceArray.length)
+        section.splice(0, section.length)
+      }
+    }
+    // -------------清除所有---------------------
+    const isClearAll = useVModel(props, 'modelValue', emit)
+    watch(isClearAll, (newVal) => {
+      if (allEntity.length === 0 && newVal === true) {
+        ElMessage({
+          message: '请先保存数据！',
+          type: 'warning'
+        })
+      }
+      if (newVal && allEntity.length !== 0 && window.viewer) {
+        // 清除所有的entity
+        allEntity.forEach(item => {
+          window.viewer.entities.remove(item)
+        })
+        allEntity.splice(0, allEntity.length)
+        allIds.splice(0, allIds.length)
+        // 清除正在画的数据
+        clearEntityFn()
+      }
+      isClearAll.value = false
     })
 
-    return { displayDis, isFooterOpen }
+    return { isClearAll, displayDis, isFooterOpen, savePolylineFn, clearEntityFn }
   }
 })
 // 鼠标左键点击事件

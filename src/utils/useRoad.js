@@ -141,7 +141,10 @@ export const useDrawSection = (data) => {
   // const data = reactive([])
 
   const chartDom = document.getElementById('Footer')
-  const myChart = echarts.init(chartDom)
+  const myChart = echarts.init(chartDom, null, {
+    width: 1856,
+    height: 300
+  })
   myChart.resize()
 
   const option = {

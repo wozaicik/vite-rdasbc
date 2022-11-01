@@ -8,7 +8,7 @@
           <el-main>
             <MainViewer></MainViewer>
           </el-main>
-          <el-footer v-if="layout.isFooterOpen"  id="Footer">
+          <el-footer v-show="layout.isFooterOpen"  id="Footer">
           </el-footer>
         </el-container>
         <el-aside width="200px" v-if="layout.isRightCollapse" class="right-aside">Aside</el-aside>
