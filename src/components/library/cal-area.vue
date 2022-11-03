@@ -4,7 +4,7 @@
           <el-row>
               <el-col class="card-header" :span="24">
                 <span >计算面积</span>
-                <el-button class="button" type="primary" icon="Delete">清除所有</el-button>
+                <el-button class="button" type="primary" icon="Delete" @click="clearAllFn()">清除所有</el-button>
               </el-col>
           </el-row>
         </div>
@@ -25,8 +25,8 @@
                 </el-row>
                 <el-row>
                     <el-col :span="24" class="option">
-                        <el-button  size="small" >保存</el-button>
-                        <el-button  size="small">清除</el-button>
+                        <el-button  size="small" @click="saveFn()">保存</el-button>
+                        <el-button  size="small" @click="clearFn()">清除</el-button>
                     </el-col>
                 </el-row>
             </el-card>
@@ -42,6 +42,7 @@ import { nanoid } from 'nanoid'
 import { car3Tran } from '@/utils/singlecoortran.js'
 import { usePolygon, useDrawPolygon } from '@/utils/usePolygon.js'
 import * as Cesium from 'cesium'
+import { ElMessage } from 'element-plus'
 
 export default defineComponent({
   name: 'calarea',
@@ -86,7 +87,7 @@ export default defineComponent({
       }
     })
     watch(isRightClick, (newBool) => {
-      if (newBool && entityPointArray) {
+      if (newBool && entityPointArray.length >= 1) {
         // 移除点entity
         entityPointIds.pop()
         const lastEntityPoint = entityPointArray.pop() // 弹出最后一个点
@@ -104,29 +105,125 @@ export default defineComponent({
         if (lonLatArray.length === 1) {
           lonLatArray.splice(0, lonLatArray.length)
         }
+        if (CoordinateArray.length < 3) {
+          const entityById = window.viewer.entities.getById(polygonId)
+          entityById.label.text = null
+          entityById.polygon.hierarchy = []
+          window.viewer.entities.remove(entityById)
+        }
       }
     })
-    // ----------添加多边形
-    const polygonIdRandom = nanoid(12) // 设置随机id
-    const polygonId = 'Area-polygon-' + index.value + polygonIdRandom
-    const entityPolygon = useDrawPolygon(polygonId)
-    watch(CoordinateArray, () => {
+    // ----------添加多边形------------------------
+    let polygonIdRandom = nanoid(12) // 设置随机id
+    let polygonId = 'Area-polygon-' + polygonIdRandom
+    // 声明一个空的entity，没有坐标。
+    // 但是有Polygon label id
+    let entityPolygon = useDrawPolygon(polygonId)
+    // 监听坐标数组的变化，当改变时，我们把entity添加viewer.entities中
+    watch(CoordinateArray, (newVal) => {
       const entityById = window.viewer.entities.getById(polygonId)
       if (!entityById) {
         window.viewer.entities.add(entityPolygon)
       }
-      if (CoordinateArray.length >= 3 && CoordinateArray.length <= 8) {
-        entityPolygon.position = Cesium.Cartesian3.fromDegrees(centroid.value[0], centroid.value[1])
-        entityPolygon.polygon.hierarchy = toRaw(CoordinateArray)
-        entityPolygon.label.text = area.value
-      } else if (CoordinateArray.length >= 9) {
-        entityPolygon.position = null
-        entityPolygon.polygon.hierarchy = null
-        entityPolygon.label.text = null
+      if (CoordinateArray.length >= 3) {
+        const coors = [...toRaw(CoordinateArray)]
+        entityById.position = Cesium.Cartesian3.fromDegrees(centroid.value[0], centroid.value[1])
+        entityById.polygon.hierarchy = coors
+        entityById.label.text = area.value
       }
     })
+    // ---------------保存-----------
+    const allIdEntityArray = []// 存储id
+    const allEntityArray = []// 存储etity
+    // const saveEntity = []
+    // 保存数据
+    const saveFn = () => {
+      // 保存
+      if (entityPointArray.length >= 3) {
+        // 保存信息
+        allEntityArray.push(...entityPointArray)
+        allEntityArray.push(entityPolygon)
+        allIdEntityArray.push(...entityPointIds)
+        allIdEntityArray.push(polygonId)
+        // 重置
+        index.value = 1
+        entityPointArray.splice(0, entityPointArray.length)
+        entityPointIds.splice(0, entityPointIds.length)
+        // 重置
+        CoordinateArray.splice(0, CoordinateArray.length)
+        lonLatArray.splice(0, lonLatArray.length)
 
-    return { Coordinate, isRightClick, area, length, centroid, entityPolygon }
+        polygonIdRandom = nanoid(12)
+        polygonId = 'Area-polygon-' + polygonIdRandom
+        entityPolygon = useDrawPolygon(polygonId)
+        ElMessage({
+          message: '保存成功',
+          type: 'success'
+        })
+      } else {
+        ElMessage({
+          message: '请先添加数据',
+          type: 'warning'
+        })
+      }
+    }
+    // ------------------清除数据--------------------
+    const clearFn = () => {
+      if (entityPointArray.length >= 1) {
+        entityPolygon.label.text = null
+        entityPolygon.polygon.hierarchy = []
+        window.viewer.entities.remove(entityPolygon)
+        entityPointArray.forEach(item => {
+          window.viewer.entities.remove(item)
+        })
+
+        // 重置
+        index.value = 1
+        entityPointArray.splice(0, entityPointArray.length)
+        entityPointIds.splice(0, entityPointIds.length)
+        // 重置
+        CoordinateArray.splice(0, CoordinateArray.length)
+        lonLatArray.splice(0, lonLatArray.length)
+
+        ElMessage({
+          message: '清除成功',
+          type: 'success'
+        })
+      } else {
+        ElMessage({
+          message: '请先添加数据',
+          type: 'warning'
+        })
+      }
+    }
+    // ------------清除所有----------------------
+    const clearAllFn = () => {
+      if (allEntityArray.length >= 1) {
+        // allEntityArray.forEach(item => {
+        //   // console.log(item)
+        //   // const entityById = window.viewer.entities.getById(polygonId)
+        //   window.viewer.entities.remove(item)
+        // })
+        allIdEntityArray.forEach(item => {
+          const itemEntiy = window.viewer.entities.getById(item)
+          window.viewer.entities.remove(itemEntiy)
+        })
+        allIdEntityArray.splice(0, allIdEntityArray.length)
+        allEntityArray.splice(0, allEntityArray.length)
+        clearFn()
+        ElMessage({
+          message: '清除成功',
+          type: 'success'
+        })
+      } else {
+        ElMessage({
+          message: '请先添加数据',
+          type: 'warning'
+        })
+      }
+    }
+
+    return { Coordinate, isRightClick, area, length, centroid, entityPolygon, saveFn, clearFn, clearAllFn }
   }
 })
 

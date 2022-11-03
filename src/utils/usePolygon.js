@@ -4,9 +4,9 @@ import * as turf from '@turf/turf'
 import { ref, watch } from 'vue'
 import * as Cesium from 'cesium'
 
-export function usePolygon (coordinatesArray) {
+export function usePolygon (lonLatArray) {
   // 使用一个变量接收数据，同时也是一个响应式
-  const coordinates = coordinatesArray
+  const coordinates = lonLatArray
   const area = ref(0) // 面积
   const length = ref(0) // 周长
   const centroid = ref(null) // 中心坐标
@@ -40,6 +40,7 @@ export function useDrawPolygon (id) {
     polygon: {
     //   extrudedHeight: 0,
     //   height: 0,
+      // hierarchy: new Cesium.PolygonHierarchy([]),
       material: Cesium.Color.RED.withAlpha(0.4),
       outline: true,
       outlineColor: Cesium.Color.BLACK
