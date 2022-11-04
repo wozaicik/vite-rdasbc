@@ -37,6 +37,12 @@ export function useClickEvent (paramsId) {
         })
       }, 3000)
     }
+    if (newVal !== paramsId && handlerLeftEvent) {
+      handlerLeftEvent.destroy()
+      handlerRightEvent.destroy()
+      handlerLeftEvent = null
+      handlerRightEvent = null
+    }
   }, { immediate: true })
 
   onUnmounted(() => {

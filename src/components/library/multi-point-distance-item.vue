@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { computed, defineComponent, onMounted, reactive, ref, watch } from 'vue'
+import { computed, defineComponent, reactive, ref, watch } from 'vue'
 import * as Cesium from 'cesium'
 import { drawPoint, drawPolylineNone } from '@/utils/drawEntity.js'
 import { useRoute } from 'vue-router'
@@ -47,9 +47,22 @@ export default defineComponent({
     }
   },
   setup (props, { emit }) {
+    // 点的序号
+    const index = ref(1)
+    // 存储临时坐标
+    const tempCoor = ref(0)
+    // 存储-entity-point
+    const entityPointArray = []
+    // 存储点的ID
+    const entityPointIds = []
+
     // ----------------------开启事件-----------------
     // 存放事件处理器 便于后期销毁
     let handlerEvent
+    // 是否点击了右键
+    const isRightClick = ref(false)
+    // 存储右键点击事件
+    let handlerRightEvent
     // 获取路由
     const route = useRoute()
     watch(() => route.params.id, (newVal) => {
@@ -57,36 +70,36 @@ export default defineComponent({
       if (newVal === 'multipointDistance') {
         // 三秒之后开启点击事件，为什么
         // 因为要等地球加载完毕，在window中存在viewer之后，才能开启事件
-        setTimeout(() => {
-          const { handler } = leftClick(tempCoor)
-          handlerEvent = handler
-          ElMessage({
-            message: '请点击地球上任意位置',
-            type: 'success'
-          })
-        }, 3000)
-      } else {
+        // setTimeout(() => {
+        const { handler } = leftClick(tempCoor)
+        const { handlerRight } = rightClick(isRightClick)
+        handlerEvent = handler
+        handlerRightEvent = handlerRight
+        ElMessage({
+          message: '请点击地球上任意位置',
+          type: 'success'
+        })
+        // }, 100)
+      }
+      if (newVal !== 'multipointDistance' && handlerEvent) {
         // 当路由变化，销毁事件
         handlerEvent.destroy()
-        handlerEvent = null
+        // handlerEvent = null
 
         // 销毁鼠标右键点击事件
         handlerRightEvent.destroy()
-        handlerRightEvent = null
+        // handlerRightEvent = null
       }
     }, { immediate: true })
     // --------开启右键点击事件--------
     // 使用另一种方式试一下开启事件
-    // 是否点击了右键
-    const isRightClick = ref(false)
-    // 存储右键点击事件
-    let handlerRightEvent
+
     // 在组件加载完成三秒后，加载鼠标右键点击事件
-    onMounted(() => {
-      setTimeout(() => {
-        handlerRightEvent = rightClick(isRightClick)
-      }, 3000)
-    })
+    // onMounted(() => {
+    //   setTimeout(() => {
+
+    //   }, 3000)
+    // })
     // 鼠标右键点击之后，
     // 1. 需要将最后一个entityPoint弹出，并删除
     // 2. entityPointIds也需要弹出
@@ -139,14 +152,6 @@ export default defineComponent({
       }
     })
     // ---------------添加点------------
-    // 点的序号
-    const index = ref(1)
-    // 存储临时坐标
-    const tempCoor = ref(null)
-    // 存储-entity-point
-    const entityPointArray = []
-    // 存储点的ID
-    const entityPointIds = []
     // 监听临时坐标的变化
     watch(tempCoor, async (newCoor) => {
       // 如果采集的坐标是Cartesian3类型
@@ -162,6 +167,7 @@ export default defineComponent({
         // 对返回的点entityPoint进行保存
         entityPointArray.push(entityPoint)
 
+        index.value++
         // 添加entityPolyline
         // 1. 将得到的新的坐标，添加到坐标对中
         // 2. 判断长度是否为2
@@ -188,7 +194,6 @@ export default defineComponent({
           distanceArray.push(distance * 1)
         }
         // 序号+1
-        index.value++
       }
     })
     //
@@ -313,20 +318,20 @@ const leftClick = (tempCoor) => {
 // 回退上一步，把最后添加的点删除
 const rightClick = (isRightClick) => {
   // 传出事件
-  let handlerRight
+  // let handlerRight
   // 右键是否点击
   const isclick = isRightClick
   // 获得全局变量中的viewer
   const viewer = window.viewer
-  if (viewer) {
-    // Cesium的事件管理函数
-    handlerRight = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas)
-    // 鼠标左键点击事件
-    handlerRight.setInputAction((movement) => {
-      isclick.value = !isclick.value
+
+  // Cesium的事件管理函数
+  const handlerRight = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas)
+  // 鼠标左键点击事件
+  handlerRight.setInputAction((movement) => {
+    isclick.value = !isclick.value
     //   console.log(isclick.value)
-    }, Cesium.ScreenSpaceEventType.RIGHT_CLICK)
-  }
+  }, Cesium.ScreenSpaceEventType.RIGHT_CLICK)
+
   return { handlerRight }
 }
 </script>

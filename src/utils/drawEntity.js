@@ -30,7 +30,8 @@ export const drawPoint = (coor, id, index) => {
       heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
       verticalOrigin: Cesium.VerticalOrigin.BASELINE,
       pixelOffset: new Cesium.Cartesian2(0, -10),
-      disableDepthTestDistance: Number.POSITIVE_INFINITY // draws the label in front of terrain
+      disableDepthTestDistance: 0 // draws the label in front of terrain
+      // disableDepthTestDistance: Number.POSITIVE_INFINITY // draws the label in front of terrain
     }
   })
   viewer = null
@@ -66,7 +67,7 @@ export const drawPolyline = (coordinates, tpMidPoint, id, distance) => {
       heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
       verticalOrigin: Cesium.VerticalOrigin.BASELINE,
       pixelOffset: new Cesium.Cartesian2(0, -10),
-      disableDepthTestDistance: Number.POSITIVE_INFINITY // draws the label in front of terrain
+      disableDepthTestDistance: 0 // draws the label in front of terrain
     }
   })
 
@@ -111,7 +112,7 @@ export const drawLabel = (tpMidPoint, id, distance) => {
       heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
       verticalOrigin: Cesium.VerticalOrigin.BASELINE,
       pixelOffset: new Cesium.Cartesian2(0, -10),
-      disableDepthTestDistance: Number.POSITIVE_INFINITY // draws the label in front of terrain
+      disableDepthTestDistance: 0 // draws the label in front of terrain
     }
   })
 
@@ -147,7 +148,7 @@ export const drawPolylineNone = (coordinates, tpMidPoint, id, distance) => {
       heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
       verticalOrigin: Cesium.VerticalOrigin.BASELINE,
       pixelOffset: new Cesium.Cartesian2(0, -10),
-      disableDepthTestDistance: Number.POSITIVE_INFINITY // draws the label in front of terrain
+      disableDepthTestDistance: 0 // draws the label in front of terrain
     }
   })
 

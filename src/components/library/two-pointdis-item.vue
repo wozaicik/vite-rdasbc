@@ -51,11 +51,13 @@
               <el-col :span="2">距离</el-col>
               <el-col :span="4">{{tpDistance}}</el-col>
               <el-col :span="2">方位角</el-col>
-              <el-col :span="4">{{tpBearing.toFixed(4)}}</el-col>
+              <el-col :span="3">{{tpBearing.toFixed(4)}}</el-col>
               <el-col :span="2">坡度</el-col>
-              <el-col :span="4">{{tpSlope.toFixed(2)}}%</el-col>
+              <el-col :span="2">{{tpSlope.toFixed(2)}}%</el-col>
               <el-col :span="2">坡向</el-col>
-              <el-col :span="4">{{tpAspect}}</el-col>
+              <el-col :span="2">{{tpAspect}}</el-col>
+              <el-col :span="2">高差</el-col>
+              <el-col :span="3">{{(oneCGCS.z-twoCGCS.z).toFixed(2)}}</el-col>
             </el-row>
           </el-col>
         </el-row>

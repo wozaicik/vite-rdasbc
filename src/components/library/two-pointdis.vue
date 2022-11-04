@@ -27,6 +27,8 @@ import * as Cesium from 'cesium'
 import { useRoute } from 'vue-router'
 import { drawPoint, clearEntityArray } from '@/utils/drawEntity.js'
 import { ElMessage } from 'element-plus'
+import { storeToRefs } from 'pinia'
+import { layoutStore } from '@/store/layoutStore.js'
 
 export default defineComponent({
   name: 'twoPointDistance',
@@ -42,24 +44,53 @@ export default defineComponent({
     // 展示坐标成果
     const show = ref(false)
 
+    const route = useRoute() //
+    const layout = layoutStore()
+    const { isViewer } = storeToRefs(layout)
+
+    watch(() => ([isViewer, route.params.id]), ([newIs, newId]) => {
+      if (newIs.value && newId === 'twoPointDistance') {
+        console.log(2)
+        const { handler } = getCoor(tempCoor)
+        handlerEvent = handler
+        ElMessage({
+          message: '请点击地球上任意位置',
+          type: 'success'
+        })
+      }
+    }, { immediate: true })
+
+    watch(isViewer, (newVal) => {
+      if (newVal && !handlerEvent) {
+        console.log(1)
+        const { handler } = getCoor(tempCoor)
+        handlerEvent = handler
+        ElMessage({
+          message: '请点击地球上任意位置',
+          type: 'success'
+        })
+      }
+    }, { immediate: true })
+
     // 根据路由来判断，是否开启左键点击事件，如果路由为：twoPointDistance
     // 则开启鼠标左边点击事件，当路由发生变化时，销毁事件
     // 监听路由的变化 开启和关闭事件
-    const route = useRoute() //
+
     watch(() => route.params.id, (newVal) => {
       // 路由一致时，开启事件
-      if (newVal === 'twoPointDistance') {
-        // 三秒之后开启点击事件，为什么
-        // 因为要等地球加载完毕，在window中存在viewer之后，才能开启事件
-        setTimeout(() => {
-          const { handler } = getCoor(tempCoor)
-          handlerEvent = handler
-          ElMessage({
-            message: '请点击地球上任意位置',
-            type: 'success'
-          })
-        }, 3000)
-      } else {
+      // if (newVal === 'twoPointDistance') {
+      //   // 三秒之后开启点击事件，为什么
+      //   // 因为要等地球加载完毕，在window中存在viewer之后，才能开启事件
+      //   setTimeout(() => {
+      //     const { handler } = getCoor(tempCoor)
+      //     handlerEvent = handler
+      //     ElMessage({
+      //       message: '请点击地球上任意位置',
+      //       type: 'success'
+      //     })
+      //   }, 3000)
+      // }
+      if (newVal !== 'twoPointDistance' && handlerEvent) {
         // 当路由变化，销毁事件
         handlerEvent.destroy()
         handlerEvent = null

@@ -9,13 +9,15 @@
           </el-row>
         </div>
         <el-card :body-style="{ padding: '15px' }" shadow="always">
-            <MulPointDistanceItem v-model="isClearAll"></MulPointDistanceItem>
+            <MulPointDistanceItem v-model="isClearAll" v-if="isViewer"></MulPointDistanceItem>
         </el-card>
     </div>
   </template>
 
 <script>
 import { defineComponent, ref } from 'vue'
+import { layoutStore } from '@/store/layoutStore.js'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'multipointDistance',
@@ -26,7 +28,12 @@ export default defineComponent({
       isClearAll.value = true
     }
 
-    return { isClearAll, clearEventFn }
+    // 主要存储界面是否加载完毕和控制菜单栏、底部的出现
+    const layout = layoutStore()
+
+    const { isViewer } = storeToRefs(layout)
+
+    return { isClearAll, clearEventFn, isViewer }
   }
 })
 </script>
