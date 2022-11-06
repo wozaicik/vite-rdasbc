@@ -50,7 +50,6 @@ export default defineComponent({
 
     watch(() => ([isViewer, route.params.id]), ([newIs, newId]) => {
       if (newIs.value && newId === 'twoPointDistance') {
-        console.log(2)
         const { handler } = getCoor(tempCoor)
         handlerEvent = handler
         ElMessage({
@@ -62,7 +61,7 @@ export default defineComponent({
 
     watch(isViewer, (newVal) => {
       if (newVal && !handlerEvent) {
-        console.log(1)
+        console.log(2)
         const { handler } = getCoor(tempCoor)
         handlerEvent = handler
         ElMessage({
@@ -77,19 +76,6 @@ export default defineComponent({
     // 监听路由的变化 开启和关闭事件
 
     watch(() => route.params.id, (newVal) => {
-      // 路由一致时，开启事件
-      // if (newVal === 'twoPointDistance') {
-      //   // 三秒之后开启点击事件，为什么
-      //   // 因为要等地球加载完毕，在window中存在viewer之后，才能开启事件
-      //   setTimeout(() => {
-      //     const { handler } = getCoor(tempCoor)
-      //     handlerEvent = handler
-      //     ElMessage({
-      //       message: '请点击地球上任意位置',
-      //       type: 'success'
-      //     })
-      //   }, 3000)
-      // }
       if (newVal !== 'twoPointDistance' && handlerEvent) {
         // 当路由变化，销毁事件
         handlerEvent.destroy()

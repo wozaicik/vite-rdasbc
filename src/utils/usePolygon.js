@@ -28,7 +28,7 @@ export function usePolygon (lonLatArray) {
       length.value = 0
       centroid.value = null
     }
-  })
+  }, { immediate: true })
 
   return { area, length, centroid }
 }
@@ -41,9 +41,9 @@ export function useDrawPolygon (id) {
     //   extrudedHeight: 0,
     //   height: 0,
       // hierarchy: new Cesium.PolygonHierarchy([]),
-      material: Cesium.Color.RED.withAlpha(0.4),
-      outline: true,
-      outlineColor: Cesium.Color.BLACK
+      material: Cesium.Color.RED.withAlpha(0.4)
+      // outline: true,
+      // outlineColor: Cesium.Color.BLACK
     },
     label: {
       font: '16px sans-serif',

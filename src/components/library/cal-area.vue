@@ -71,7 +71,6 @@ export default defineComponent({
         entityPointArray.push(entityPoint) // 保存entity
 
         // 面相关的函数
-        CoordinateArray.push(Coordinate.value)
         // 计算经纬度
         const { lonLat } = car3Tran(Coordinate)
         if (lonLatArray.length === 0) {
@@ -83,6 +82,7 @@ export default defineComponent({
           // 每次在倒数第二的位置插入坐标
           lonLatArray.splice(-1, 0, [lonLat.value.x, lonLat.value.y])
         }
+        CoordinateArray.push(Coordinate.value)
         index.value++
       }
     })
@@ -120,12 +120,12 @@ export default defineComponent({
     // 但是有Polygon label id
     let entityPolygon = useDrawPolygon(polygonId)
     // 监听坐标数组的变化，当改变时，我们把entity添加viewer.entities中
-    watch(CoordinateArray, (newVal) => {
+    watch([CoordinateArray, centroid], ([newCoorArray, newCentroid]) => {
       const entityById = window.viewer.entities.getById(polygonId)
       if (!entityById) {
         window.viewer.entities.add(entityPolygon)
       }
-      if (CoordinateArray.length >= 3) {
+      if (newCentroid && CoordinateArray.length >= 3) {
         const coors = [...toRaw(CoordinateArray)]
         entityById.position = Cesium.Cartesian3.fromDegrees(centroid.value[0], centroid.value[1])
         entityById.polygon.hierarchy = coors

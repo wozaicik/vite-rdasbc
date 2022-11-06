@@ -65,12 +65,11 @@ export default defineComponent({
     let handlerRightEvent
     // 获取路由
     const route = useRoute()
-    watch(() => route.params.id, (newVal) => {
-      // 路由一致时，开启事件
-      if (newVal === 'multipointDistance') {
-        // 三秒之后开启点击事件，为什么
-        // 因为要等地球加载完毕，在window中存在viewer之后，才能开启事件
-        // setTimeout(() => {
+    const layout = layoutStore()
+    const { isViewer } = storeToRefs(layout)
+
+    watch(() => ([isViewer, route.params.id]), ([newIs, newId]) => {
+      if (newIs.value && newId === 'multipointDistance') {
         const { handler } = leftClick(tempCoor)
         const { handlerRight } = rightClick(isRightClick)
         handlerEvent = handler
@@ -79,33 +78,39 @@ export default defineComponent({
           message: '请点击地球上任意位置',
           type: 'success'
         })
-        // }, 100)
       }
+    }, { immediate: true })
+
+    watch(isViewer, (newVal) => {
+      if (newVal && !handlerEvent) {
+        const { handler } = leftClick(tempCoor)
+        const { handlerRight } = rightClick(isRightClick)
+        handlerEvent = handler
+        handlerRightEvent = handlerRight
+        ElMessage({
+          message: '请点击地球上任意位置',
+          type: 'success'
+        })
+      }
+    }, { immediate: true })
+
+    watch(() => route.params.id, (newVal) => {
       if (newVal !== 'multipointDistance' && handlerEvent) {
         // 当路由变化，销毁事件
         handlerEvent.destroy()
-        // handlerEvent = null
+        handlerEvent = null
 
         // 销毁鼠标右键点击事件
         handlerRightEvent.destroy()
-        // handlerRightEvent = null
+        handlerRightEvent = null
       }
     }, { immediate: true })
-    // --------开启右键点击事件--------
-    // 使用另一种方式试一下开启事件
 
-    // 在组件加载完成三秒后，加载鼠标右键点击事件
-    // onMounted(() => {
-    //   setTimeout(() => {
-
-    //   }, 3000)
-    // })
     // 鼠标右键点击之后，
     // 1. 需要将最后一个entityPoint弹出，并删除
     // 2. entityPointIds也需要弹出
     // 3. 将isRightClick设置为false
     // 4. 将index-1
-
     // 监听是否点击了鼠标右键
     watch(isRightClick, (newVal) => {
       // 当点击了鼠标右键时，存储entityPointArray的数组也必须有值
@@ -216,7 +221,7 @@ export default defineComponent({
     // 存储生成断面的数据 数据结构为[[] [] [] [] []]
     const section = reactive([])
     // 拿到状态库
-    const layout = layoutStore()
+    // const layout = layoutStore()
     const { isFooterOpen } = storeToRefs(layout)
 
     watch(section, () => {
