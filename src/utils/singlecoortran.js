@@ -31,6 +31,35 @@ export const car3Tran = (Cartesian3) => {
   return { lonLat, gsProj, localCoor }
 }
 
+export const car3TranNew = (Cartesian3) => {
+  const car3 = Cartesian3
+
+  if (!car3.value) {
+    const lonLat = ref(null)
+    lonLat.value = { x: 0, y: 0, z: 0 }
+    const gsProj = ref(null)
+    gsProj.value = { x: 0, y: 0, z: 0 }
+    const localCoor = ref(null)
+    localCoor.value = { x: 0, y: 0, z: 0 }
+    return {
+      lonLat, gsProj, localCoor
+    }
+  }
+  //  将Cartesian3坐标转换为经纬度
+  const lonLat = ref(null)
+  lonLat.value = Cartesian3ToCartographicDegree(car3.value)
+
+  // 将经纬度转换为国家2000坐标
+  const gsProj = ref(null)
+  gsProj.value = lonLatToCGCS(lonLat.value)
+
+  // 将国家2000坐标转换为地方坐标系
+  const localCoor = ref(null)
+  localCoor.value = CGCSToLocal(gsProj.value)
+
+  return { lonLat, gsProj, localCoor }
+}
+
 /**
  * 将笛卡尔空间直角坐标系转换为角度制-经纬度
  * @param {Cesium.Cartesian3} Cartesian3 笛卡尔空间直角坐标系
