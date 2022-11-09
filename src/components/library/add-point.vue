@@ -106,13 +106,23 @@
 
 <script>
 
-import { computed, defineComponent, ref, watch } from 'vue'
+import { defineComponent, ref, watch } from 'vue'
 import { useMouseLeftClick } from '@/utils/mouseLeft.js'
+import { useBlankPoint } from '@/utils/usePoint.js'
 import { car3Tran } from '@/utils/singlecoortran.js'
+import { nanoid } from 'nanoid'
+import { watchOnce } from '@vueuse/core'
+// import { layoutStore } from '@/store/layoutStore.js'
+// import { storeToRefs } from 'pinia'
+// import { useRoute } from 'vue-router'
 
 export default defineComponent({
   name: 'addPoint',
   setup () {
+    const pointIdRandom = nanoid(12) // 设置随机id
+    const pointId = 'add-point-' + pointIdRandom
+    const entityBlankPoint = useBlankPoint(pointId)
+
     // 鼠标左键点击事件
     const { coordinate: coorClick } = useMouseLeftClick('addPoint')
     // 点的名称
@@ -156,42 +166,47 @@ export default defineComponent({
     const LL = ref({ x: 0, y: 0 })
     const CGCS = ref({ x: 0, y: 0 })
     const LC = ref({ x: 0, y: 0 })
+    // 监听鼠标点击坐标，计算相应的坐标
     watch(coorClick, () => {
-      const { lonLat, gsProj, localCoor } = car3Tran(coorClick)
+      const { lonLat, gsProj, localCoor, coorT } = coorToFour(coorClick, coorType.value)
       LL.value = lonLat.value
       CGCS.value = gsProj.value
       LC.value = localCoor.value
-      if (coorType.value === 'LL' && LL.value) {
-        coorBidirectional.value = LL.value
-      }
-      if (coorType.value === 'CGCS' && CGCS.value) {
-        coorBidirectional.value = CGCS.value
-      }
-      if (coorType.value === 'LC' && LC.value) {
-        coorBidirectional.value = LC.value
-      }
+      coorBidirectional.value = coorT
     })
-    const coorInput = computed(() => {
-      return { x: coorBidirectional.value.x, y: coorBidirectional.value.y, z: coorBidirectional.value.z }
-    })
-    watch(coorInput, (newCoor) => {
-      console.log(newCoor, 1)
-      console.log(coorBidirectional.value, 2)
-    })
-    // watch(() => [coorBidirectional.value.x, coorBidirectional.value.y], ([newX, newY]) => {
-    //   console.log(coorBidirectional.value, 2)
-    // })
+    // 点击切换函数
     const toggleFn = (label) => {
-      if (coorType.value === 'LL' && LL.value) {
-        coorBidirectional.value = LL.value
-      }
-      if (coorType.value === 'CGCS' && CGCS.value) {
-        coorBidirectional.value = CGCS.value
-      }
-      if (coorType.value === 'LC' && LC.value) {
-        coorBidirectional.value = LC.value
-      }
+      const { coorT } = coorToFour(coorClick, label)
+      coorBidirectional.value = coorT
     }
+    // 判断是否进行了人工输入
+    const isInput = ref(false)
+    watch(() => coorBidirectional.value, () => {
+      const coorBArray = Object.values(coorBidirectional.value)
+      if (coorType.value === 'LL') {
+        const LLArray = Object.values(LL.value)
+        isInput.value = coorBArray.toString() === LLArray.toString()
+      }
+      if (coorType.value === 'CGCS') {
+        const CGCSArray = Object.values(CGCS.value)
+        isInput.value = coorBArray.toString() === CGCSArray.toString()
+      }
+      if (coorType.value === 'LC') {
+        const LCArray = Object.values(LC.value)
+        isInput.value = coorBArray.toString() === LCArray.toString()
+      }
+      if (isInput.value) {
+        const entityById = window.viewer.entities.getById(pointId)
+        entityById.position = coorClick.value
+        entityById.label.text = pointName.value
+      }
+    }, { deep: true })
+
+    // 添加entityPointe
+    watchOnce(() => coorBidirectional.value.x, () => {
+      window.viewer.entities.add(entityBlankPoint)
+    })
+
     return {
       labelColor,
       labelPredefineColors,
@@ -210,6 +225,21 @@ export default defineComponent({
     }
   }
 })
+
+const coorToFour = (coorClick, coorType) => {
+  let coorT = {}
+  const { lonLat, gsProj, localCoor } = car3Tran(coorClick)
+  if (coorType === 'LL') {
+    coorT = { x: lonLat.value.x, y: lonLat.value.y, z: lonLat.value.z }
+  }
+  if (coorType === 'CGCS') {
+    coorT = { x: gsProj.value.x, y: gsProj.value.y, z: gsProj.value.z }
+  }
+  if (coorType === 'LC') {
+    coorT = { x: localCoor.value.x, y: localCoor.value.y, z: localCoor.value.z }
+  }
+  return { lonLat, gsProj, localCoor, coorT }
+}
 </script>
 
 <style scoped lang="scss">
