@@ -113,6 +113,32 @@ export const lonLatToCGCS = (lonLat) => {
   return { x: gsProj[0], y: gsProj[1], z: lonLat.z }
 }
 
+/**
+ * 国家2000转经纬度
+ * @param {Object} CGCS 国家2000坐标系的坐标
+ * @returns
+ */
+export const CGCSToLonLat = (CGCS) => {
+  proj4.defs([
+    [
+      'EPSG:4326',
+      '+title=WGS 84 (long/lat) +proj=longlat +ellps=WGS84 +datum=WGS84 +units=degrees'],
+    [
+      'EPSG:4547',
+      '+proj=tmerc +lat_0=0 +lon_0=114 +k=1 +x_0=500000 +y_0=0 +ellps=GRS80 +units=m +no_defs +type=crs'
+    ]
+  ])
+  //   计算坐标
+  const LonLat = proj4('EPSG:4547', 'EPSG:4326', [CGCS.x, CGCS.y])
+
+  return { x: LonLat[0], y: LonLat[1], z: CGCS.z }
+}
+
+/**
+ *  国家2000转地方坐标
+ * @param {Object} CGCS 国家2000坐标系的坐标
+ * @returns
+ */
 export const CGCSToLocal = (CGCS) => {
   // 定义四参数
   const dx = -374100

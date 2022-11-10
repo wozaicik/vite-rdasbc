@@ -6,7 +6,7 @@
                     <span>名称：</span>
                 </el-col>
                 <el-col :span="20">
-                    <el-input v-model="pointName"  placeholder="请输入名称"  />
+                    <el-input v-model="labelText"  placeholder="请输入名称"  />
                 </el-col>
             </el-row>
         </div>
@@ -89,9 +89,9 @@
                                 <el-input-number
                                     v-model="pointHeight"
                                     :min="0"
-                                    :max="200"
-                                    :precision="2"
-                                    :step="0.1"
+                                    :max="2000"
+                                    :precision="0"
+                                    :step="10"
                                     size="small"
                                     controls-position="right"
                                 />
@@ -106,12 +106,13 @@
 
 <script>
 
-import { defineComponent, ref, watch } from 'vue'
+import { defineComponent, reactive, ref, watch } from 'vue'
 import { useMouseLeftClick } from '@/utils/mouseLeft.js'
 import { useBlankPoint } from '@/utils/usePoint.js'
-import { car3Tran } from '@/utils/singlecoortran.js'
+import { car3Tran, CGCSToLonLat } from '@/utils/singlecoortran.js'
 import { nanoid } from 'nanoid'
-import { watchOnce } from '@vueuse/core'
+// import { watchOnce } from '@vueuse/core'
+import * as Cesium from 'cesium'
 // import { layoutStore } from '@/store/layoutStore.js'
 // import { storeToRefs } from 'pinia'
 // import { useRoute } from 'vue-router'
@@ -124,14 +125,16 @@ export default defineComponent({
     const entityBlankPoint = useBlankPoint(pointId)
 
     // 鼠标左键点击事件
-    const { coordinate: coorClick } = useMouseLeftClick('addPoint')
+    const { coordinate: coorClick } = useMouseLeftClick('addPoint', () => {
+      window.viewer.entities.add(entityBlankPoint)
+    })
     // 点的名称
-    const pointName = ref('未命名点')
+    const labelText = ref('未命名点')
     // 坐标系类型
     const coorType = ref('CGCS')
     // 标签的比例、颜色-透明度设置
     const labelScale = ref(1)
-    const labelColor = ref('rgba(0, 0, 0, 1)')
+    const labelColor = ref('rgba(255, 255, 255, 1)')
     const labelPredefineColors = ref([
       '#000000',
       '#FF0000',
@@ -145,8 +148,8 @@ export default defineComponent({
       '#1e90ff'
     ])
     // 点的比例、颜色-透明度设置
-    const pointScale = ref(1)
-    const pointColor = ref('rgba(255, 0, 0, 1)')
+    const pointScale = ref(0.5)
+    const pointColor = ref('rgba(255, 255, 255, 1)')
     const pointPredefineColors = ref([
       '#000000',
       '#FF0000',
@@ -161,6 +164,26 @@ export default defineComponent({
     ])
     // 点的高度
     const pointHeight = ref(0.00)
+    // 需要修改的选项
+    const objOption = reactive({ labelText, labelScale, labelColor, pointScale, pointColor, pointHeight })
+    watch(objOption, () => {
+      const entityById = window.viewer.entities.getById(pointId)
+      entityById.label.text = objOption.labelText
+      entityById.label.scale = objOption.labelScale
+      entityById.label.fillColor = Cesium.Color.fromCssColorString(objOption.labelColor)
+      entityById.billboard.scale = objOption.pointScale
+      entityById.billboard.color = Cesium.Color.fromCssColorString(objOption.pointColor)
+      if (objOption.pointHeight !== 0.0) {
+        entityById.label.heightReference = Cesium.HeightReference.RELATIVE_TO_GROUND
+        entityById.billboard.heightReference = Cesium.HeightReference.RELATIVE_TO_GROUND
+        entityById.position = Cesium.Cartesian3.fromDegrees(LL.value.x, LL.value.y, LL.value.z + objOption.pointHeight)
+      }
+      if (objOption.pointHeight === 0.0) {
+        entityById.label.heightReference = Cesium.HeightReference.CLAMP_TO_GROUND
+        entityById.billboard.heightReference = Cesium.HeightReference.CLAMP_TO_GROUND
+        entityById.position = coorClick.value
+      }
+    })
     // 显示在面板中的坐标
     const coorBidirectional = ref({ x: 0, y: 0 })
     const LL = ref({ x: 0, y: 0 })
@@ -183,29 +206,32 @@ export default defineComponent({
     const isInput = ref(false)
     watch(() => coorBidirectional.value, () => {
       const coorBArray = Object.values(coorBidirectional.value)
+      const changeCoor = ref({ x: 0, y: 0 })
+      const entityById = window.viewer.entities.getById(pointId)
       if (coorType.value === 'LL') {
         const LLArray = Object.values(LL.value)
         isInput.value = coorBArray.toString() === LLArray.toString()
+        changeCoor.value = Cesium.Cartesian3.fromDegrees(coorBidirectional.value.x, coorBidirectional.value.y, coorBidirectional.value.z)
       }
       if (coorType.value === 'CGCS') {
         const CGCSArray = Object.values(CGCS.value)
         isInput.value = coorBArray.toString() === CGCSArray.toString()
+        const tempCoor = CGCSToLonLat(coorBidirectional.value)
+        changeCoor.value = Cesium.Cartesian3.fromDegrees(tempCoor.x, tempCoor.y, tempCoor.z)
       }
       if (coorType.value === 'LC') {
         const LCArray = Object.values(LC.value)
         isInput.value = coorBArray.toString() === LCArray.toString()
+        changeCoor.value = coorBidirectional.value
       }
       if (isInput.value) {
-        const entityById = window.viewer.entities.getById(pointId)
         entityById.position = coorClick.value
-        entityById.label.text = pointName.value
+        entityById.label.text = objOption.labelText
+      }
+      if (!isInput.value) {
+        coorClick.value = changeCoor.value
       }
     }, { deep: true })
-
-    // 添加entityPointe
-    watchOnce(() => coorBidirectional.value.x, () => {
-      window.viewer.entities.add(entityBlankPoint)
-    })
 
     return {
       labelColor,
@@ -215,7 +241,7 @@ export default defineComponent({
       pointColor,
       pointPredefineColors,
       coorType,
-      pointName,
+      labelText,
       pointHeight,
       toggleFn,
       coorBidirectional,
