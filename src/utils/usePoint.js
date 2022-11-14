@@ -20,8 +20,9 @@ export function useBlankPoint (id) {
       fillColor: Cesium.Color.WHITE,
       heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
       // heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
+      // horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
       verticalOrigin: Cesium.VerticalOrigin.BASELINE,
-      pixelOffset: new Cesium.Cartesian2(0, -28),
+      pixelOffset: new Cesium.Cartesian2(28, -20),
       disableDepthTestDistance: Number.POSITIVE_INFINITY // draws the label in front of terrain
     }
   })
